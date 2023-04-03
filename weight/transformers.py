@@ -4,11 +4,12 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import OneHotEncoder
 import pickle
 from sklearn.preprocessing import StandardScaler, LabelEncoder
-from dirt_pred_preprocess import custom_preprocess
+from preprocess import custom_preprocess
 
 class DataLoader(BaseEstimator, TransformerMixin):
-    def __init__(self, path):
+    def __init__(self, path, load_type):
         self.path = path
+        self.load_type = load_type
 
     def pickle_load(self, path):
         file = open(path, 'rb')
@@ -16,9 +17,16 @@ class DataLoader(BaseEstimator, TransformerMixin):
         file.close()
         
         return data
+    
+    def csv_load(self, path):
+        data = pd.read_csv(f"{path}")
+        return data
 
     def load_data(self):
-        data = self.pickle_load(self.path)
+        if self.load_type == "pickle":
+            data = self.pickle_load(self.path)
+        elif self.load_type == "csv":
+            data = self.csv_load(self.path)
 
         return data
     
