@@ -5,6 +5,7 @@ from sklearn.preprocessing import OneHotEncoder
 import pickle 
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from preprocess import custom_preprocess
+from keras.utils import np_utils
 
 class DataLoader(BaseEstimator, TransformerMixin):
     def __init__(self, path, load_type):
@@ -68,9 +69,10 @@ class FeatureTargetSplitter(BaseEstimator, TransformerMixin):
 
         return X, y
     
+
 class FeatureDataTypeExtractor(BaseEstimator, TransformerMixin):
-    def __init__(self, target):
-        self.target = target
+    def __init__(self):
+        pass
 
     def fit(self, X, y=None):
         return self
@@ -84,6 +86,26 @@ class FeatureDataTypeExtractor(BaseEstimator, TransformerMixin):
         return X, y, (NUMERICAL, CATEGORICAL)
     
 
+class TargetEncoder(BaseEstimator, TransformerMixin):
+    def __init__(self):
+        pass
+
+    def fit(self, X, y=None):
+        return self
+    
+    def transform(self, X):
+        X, y, _ = X
+        classification_type = ""
+        if y.nunique() > 2: # one-hot encode (multi-class classification)
+            y = np_utils.to_categorical(y)
+            classification_type = "multi"
+
+        else: # binary classification
+            y = LabelEncoder().fit_transform(y)
+            classification_type = "binary"
+
+        return X, y, _, classification_type
+        
 
 # split features and target
 

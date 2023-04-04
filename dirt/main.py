@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.pipeline import Pipeline
-from transformers import DataLoader, CustomPreprocessor, FeatureTargetSplitter, FeatureDataTypeExtractor
+from transformers import DataLoader, CustomPreprocessor, FeatureTargetSplitter, FeatureDataTypeExtractor, TargetEncoder
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
@@ -31,17 +31,12 @@ preprocessor_pipeline = Pipeline([
     ('load_data', DataLoader(DATA_PATH, LOAD_TYPE)),
     ('custom_preprocess', CustomPreprocessor(CUSTOM_PREPROCESS)),
     ('feauture_target_split', FeatureTargetSplitter(TARGET)),
-    ('feature_type_extract', FeatureDataTypeExtractor(TARGET))
+    ('feature_type_extract', FeatureDataTypeExtractor()),
+    ('target_encode', TargetEncoder())
 
 ])
 
-X, y, FEATURES = preprocessor_pipeline.fit_transform(None) 
-
-NUMERICAL = FEATURES[0]
-CATEGORICAL = FEATURES[1]
-
-y = LabelEncoder().fit_transform(y)
-
+X, y, (NUMERICAL, CATEGORICAL), CLASSIFICATION_TYPE = preprocessor_pipeline.fit_transform(None) 
 
 # TODO: ABOVE THIS LINE SHOULD MOVE TO DATASET.PY WHICH IS IN DEVELOP BRANCH
 
